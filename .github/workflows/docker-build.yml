@@ -1,0 +1,36 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main   # Runs when you push to main branch
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Step 3: Build Docker image
+      - name: Build Docker image
+        run: docker build -t mahikrishna/exercise-1:${{ github.sha }} ./aks-store-demo
+
+      # Step 4: Push Docker image
+      - name: Push Docker image
+        run: docker push mahikrishna/exercise-1:${{ github.sha }}
+
+      # (Optional) Tag as latest
+      - name: Tag image as latest
+        run: |
+          docker tag mahikrishna/exercise-1:${{ github.sha }} mahikrishna/exercise-1:latest
+          docker push mahikrishna/exercise-1:latest
